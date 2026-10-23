@@ -27,6 +27,7 @@ jobs:
 
       - name: Initialize Android Structure
         run: |
+          flutter --disable-analytics
           flutter create . --org com.cashelbalad --project-name cash_elbalad --force
 
       - name: Build Debug APK

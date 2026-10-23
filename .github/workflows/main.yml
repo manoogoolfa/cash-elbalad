@@ -2,29 +2,41 @@ name: Build Flutter APK
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          flutter-version: '3.19.x'
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
           channel: 'stable'
 
-      - name: Install Dependencies
-        run: flutter pub get
+      - name: Generate Complete Flutter Android Project
+        run: |
+          mkdir temp_app
+          flutter create temp_app --org com.cashelbalad
+          cp -r lib temp_app/
+          cp pubspec.yaml temp_app/
+          cd temp_app
+          flutter pub get
+          flutter build apk --release
 
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: temp_app/build/app/outputs/flutter-apk/app-release.apk

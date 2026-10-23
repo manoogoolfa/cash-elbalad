@@ -25,17 +25,12 @@ jobs:
         with:
           flutter-version: '3.16.5'
 
-      - name: Generate and Build APK
+      - name: Initialize Android Structure
         run: |
-          flutter create temp_project --org com.cashelbalad
-          rm -rf temp_project/lib
-          cp -r lib temp_project/
-          cp pubspec.yaml temp_project/
-          
-          # Adjust minSdkVersion for compatibility
-          sed -i 's/minSdkVersion.*/minSdkVersion 21/' temp_project/android/app/build.gradle
-          
-          cd temp_project
+          flutter create . --org com.cashelbalad --project-name cash_elbalad --force
+
+      - name: Build Debug APK
+        run: |
           flutter pub get
           flutter build apk --debug
 
@@ -43,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: temp_project/build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
